@@ -1,6 +1,7 @@
 package br.com.dev1risjc.grafos;
 
-import br.com.dev1risjc.interfaceContrato.InterfaceContrato;
+import br.com.dev1risjc.grafos.contrato.InterfaceContrato;
+import br.com.dev1risjc.grafos.contrato.MyJMenuItem;
 
 import javax.swing.*;
 import java.util.HashMap;
@@ -10,7 +11,7 @@ public class ModuloFrameImpl implements IModuloFrame {
 
     GeradorGrafo telaGrafos;
 
-    public ModuloFrameImpl(List<JMenuItem> itensPopup, HashMap<InterfaceContrato, InterfaceContrato> filiacoes) {
+    public ModuloFrameImpl(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes) {
         this.telaGrafos = new GeradorGrafo(itensPopup, filiacoes);
         telaGrafos.init();
         telaGrafos.setLocationRelativeTo(null);

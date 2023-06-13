@@ -1,6 +1,7 @@
 package br.com.dev1risjc.grafos;
 
-import br.com.dev1risjc.interfaceContrato.InterfaceContrato;
+import br.com.dev1risjc.grafos.contrato.InterfaceContrato;
+import br.com.dev1risjc.grafos.contrato.MyJMenuItem;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import edu.uci.ics.jung.graph.DelegateForest;
 import edu.uci.ics.jung.graph.Forest;
@@ -14,25 +15,26 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GeradorGrafo extends JFrame {
     private String numeroLivroEscolhido;
-    List<JMenuItem> itensPopup;
+    List<MyJMenuItem> itensPopup;
     Forest<String, String> grafo;
     List<InterfaceContrato> listaVertices = new ArrayList<>();
-    HashMap<InterfaceContrato, InterfaceContrato> filiacoes;
+    HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes;
 
-    public GeradorGrafo(List<JMenuItem> itensPopup, HashMap<InterfaceContrato, InterfaceContrato> filiacoes) {
+    public GeradorGrafo(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes) {
         this.itensPopup = itensPopup;
         this.filiacoes = filiacoes;
     }
 
     public void init() {
-
         JPopupMenu popupMenu = new JPopupMenu();
         popupMenu.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
+
         if (!itensPopup.isEmpty()) {
-            for (JMenuItem menuItem : itensPopup) {
+            for (MyJMenuItem menuItem : itensPopup) {
                 popupMenu.add(menuItem);
             }
         }
@@ -82,26 +84,36 @@ public class GeradorGrafo extends JFrame {
 
     }
 
+    private List<InterfaceContrato> getDistinctKeys() {
+        HashMap<InterfaceContrato, InterfaceContrato> distinct = new HashMap<>();
+        for (InterfaceContrato key : filiacoes.keySet()) {
+            distinct.putIfAbsent(key, null);
+            for (InterfaceContrato value : filiacoes.get(key)) {
+                distinct.putIfAbsent(value, null);
+            }
+        }
+        return distinct.keySet().stream().collect(Collectors.toList());
+    }
+
     public void criarVertices() {
-        for (InterfaceContrato l : filiacoes.keySet()) {
-            grafo.addVertex(l.getNumeroLivro());
-            listaVertices.add(l);
-            grafo.addVertex(filiacoes.get(l).getNumeroLivro());
-            listaVertices.add(filiacoes.get(l));
+        List<InterfaceContrato> distinct = getDistinctKeys();
+        for (InterfaceContrato key : distinct) {
+            grafo.addVertex(key.toString());
         }
     }
 
     public void criarArestas() {
-        for (InterfaceContrato l : filiacoes.keySet()) {
-            grafo.addEdge("Edge" + l.getNumeroLivro() + filiacoes.get(l).getNumeroLivro(), l.getNumeroLivro(), filiacoes.get(l).getNumeroLivro());
+        for (InterfaceContrato key : filiacoes.keySet()) {
+            for (InterfaceContrato value : filiacoes.get(key)) {
+                grafo.addEdge("Filiação", key.toString(), value.toString());
+            }
         }
     }
 
     public void limparTela() {
-        for (InterfaceContrato l : filiacoes.keySet()) {
-            grafo.removeVertex(l.getNumeroLivro());
-            grafo.removeVertex(filiacoes.get(l).getNumeroLivro());
+        List<InterfaceContrato> distinct = getDistinctKeys();
+        for (InterfaceContrato key : distinct) {
+            grafo.removeVertex(key.toString());
         }
-        listaVertices.clear();
     }
 }

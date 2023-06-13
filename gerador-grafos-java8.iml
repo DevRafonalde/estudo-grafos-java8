@@ -11,6 +11,5 @@
     <orderEntry type="library" name="failureaccess-1.0.1" level="project" />
     <orderEntry type="library" name="guava-30.1-jre" level="project" />
     <orderEntry type="library" name="jung-algorithms-2.1.1" level="project" />
-    <orderEntry type="library" name="interface-contrato" level="project" />
   </component>
 </module>
