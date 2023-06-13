@@ -74,7 +74,6 @@ public class GeradorGrafo extends JFrame {
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
 
         // Criação do frame para exibir o visualizador
-//        JFrame frame = new JFrame("Graph Visualization");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().add(vv);
         setLocationRelativeTo(null);
