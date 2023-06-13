@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="interface-contrato">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/interface-contrato.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
