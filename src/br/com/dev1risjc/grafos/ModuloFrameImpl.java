@@ -13,11 +13,9 @@ public class ModuloFrameImpl implements IModuloFrame {
 
     public ModuloFrameImpl(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes) {
         this.telaGrafos = new GeradorGrafo(itensPopup, filiacoes);
-        telaGrafos.init();
-        telaGrafos.setLocationRelativeTo(null);
-        telaGrafos.setTitle("Grafo de filiação de TRAs");
-        telaGrafos.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        telaGrafos.pack();
+//        telaGrafos.setLocationRelativeTo(null);
+//        telaGrafos.setTitle("Grafo de filiação de TRAs");
+//        telaGrafos.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     @Override
@@ -35,20 +33,29 @@ public class ModuloFrameImpl implements IModuloFrame {
         telaGrafos.limparTela();
     }
 
-    @Override
-    public void criarVertices() {
-        telaGrafos.criarVertices();
-    }
-
-    @Override
-    public void criarArestas() {
-        telaGrafos.criarArestas();
-    }
+//    @Override
+//    public void criarVertices() {
+//        telaGrafos.criarVertices();
+//    }
+//
+//    @Override
+//    public void criarArestas() {
+//        telaGrafos.criarArestas();
+//    }
 
     @Override
     public void refazerTela() {
         limparTela();
-        criarVertices();
-        criarArestas();
+        telaGrafos.init();
+    }
+
+    @Override
+    public void criarGrafo() {
+        telaGrafos.init();
+        telaGrafos.setTitle("Grafo de filiação de TRAs");
+        telaGrafos.setLocationRelativeTo(null);
+        telaGrafos.pack();
+        telaGrafos.setVisible(true);
+        telaGrafos.pack();
     }
 }

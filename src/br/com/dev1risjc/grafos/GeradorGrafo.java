@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GeradorGrafo extends JFrame {
+    private boolean grafoGerado = false;
     private String numeroLivroEscolhido;
     List<MyJMenuItem> itensPopup;
     Forest<String, String> grafo;
@@ -40,6 +41,9 @@ public class GeradorGrafo extends JFrame {
         }
 
         grafo = new DelegateForest<>();
+        criarVertices();
+        criarArestas();
+        grafo.getEdges().stream().forEach(System.out::println);
         TreeLayout<String, String> layout = new TreeLayout<>(grafo);
 
         // Criação do visualizador do grafo
@@ -76,12 +80,13 @@ public class GeradorGrafo extends JFrame {
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
 
         // Criação do frame para exibir o visualizador
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        setTitle("Grafo de filiação de TRAs");
+//        setLocationRelativeTo(null);
+//        pack();
+//        setVisible(true);
         getContentPane().add(vv);
-        setLocationRelativeTo(null);
-        pack();
-        setVisible(true);
-
+        grafoGerado = true;
     }
 
     private List<InterfaceContrato> getDistinctKeys() {
@@ -105,15 +110,22 @@ public class GeradorGrafo extends JFrame {
     public void criarArestas() {
         for (InterfaceContrato key : filiacoes.keySet()) {
             for (InterfaceContrato value : filiacoes.get(key)) {
-                grafo.addEdge("Filiação", key.toString(), value.toString());
+                String nomeAresta = "Filiação " + key.toString() + " -> " + value.toString();
+                if (!grafo.getEdges().parallelStream().anyMatch(aresta -> nomeAresta.equalsIgnoreCase(aresta))) {
+                    grafo.addEdge(nomeAresta , key.toString(), value.toString());
+                    System.out.println("Origem: " + key + " -> Destino: " + value);
+                }
+
             }
         }
     }
 
     public void limparTela() {
-        List<InterfaceContrato> distinct = getDistinctKeys();
-        for (InterfaceContrato key : distinct) {
-            grafo.removeVertex(key.toString());
+        if (grafoGerado) {
+            List<InterfaceContrato> distinct = getDistinctKeys();
+            for (InterfaceContrato key : distinct) {
+                grafo.removeVertex(key.toString());
+            }
         }
     }
 }

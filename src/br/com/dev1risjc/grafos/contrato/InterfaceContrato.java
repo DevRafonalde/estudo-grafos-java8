@@ -11,9 +11,10 @@ public interface InterfaceContrato <V> {
 //    public void visualizarInscricoes(String numeroLivro);
 //    public void navegacaoAvancada(String numeroLivro);
 
-    public V getId();
+    public V getObjeto();
 
-    @Override
+
+
     public String toString();
 
 }
