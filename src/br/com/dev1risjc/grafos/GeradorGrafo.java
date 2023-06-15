@@ -2,6 +2,7 @@ package br.com.dev1risjc.grafos;
 
 import br.com.dev1risjc.grafos.contrato.InterfaceContrato;
 import br.com.dev1risjc.grafos.contrato.MyJMenuItem;
+import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import edu.uci.ics.jung.graph.DelegateForest;
@@ -13,8 +14,10 @@ import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.GraphMouseListener;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
+import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
+import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
 import org.apache.commons.collections4.Transformer;
 
 import javax.swing.*;
@@ -22,6 +25,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +48,7 @@ public class GeradorGrafo extends JFrame {
     }
 
     public void init() {
+        final DefaultModalGraphMouse<String, Integer> graphMouse = new DefaultModalGraphMouse<String, Integer>();
         Transformer<String, Paint> vertexColor = new Transformer<String, Paint>() {
             @Override
             public Paint transform(String input) {
@@ -58,6 +64,26 @@ public class GeradorGrafo extends JFrame {
                     cor = Color.black;
                 }
                 return cor;
+            }
+        };
+
+        Transformer<String,Shape> vertexSize = new Transformer<String,Shape>(){
+            public Shape transform(String i){
+                Ellipse2D circle = new Ellipse2D.Double(-15, -15, 30, 30);
+                // in this case, the vertex is twice as large
+                return AffineTransform.getScaleInstance(1.5, 1.5).createTransformedShape(circle);
+            }
+        };
+
+        // Set up a new stroke Transformer for the edges
+        // BasicStroke用法：http://momsbaby1986.iteye.com/blog/1462901
+        // 把设置好的画笔通过Transformer返回给edgeStrokeTransformer
+        Transformer<String, Stroke> edgeStrokeTransformer = new Transformer<String, Stroke>() {
+            float test[] = {10.0f};
+            final Stroke linhaMaior = new BasicStroke(1.0f, BasicStroke.CAP_ROUND,
+                    BasicStroke.JOIN_MITER, 10.0f, test, 0.0f);
+            public Stroke transform(String s) {
+                return linhaMaior;
             }
         };
 
@@ -83,6 +109,7 @@ public class GeradorGrafo extends JFrame {
                             cor = Color.WHITE;
                         }
                         setForeground(cor);
+                        setFont(new Font("Trebuchet MS", Font.BOLD, 12));
                         return this;
                     }
                 };
@@ -102,10 +129,11 @@ public class GeradorGrafo extends JFrame {
         criarVertices();
         criarArestas();
 //        grafo.getEdges().stream().forEach(System.out::println);
-        TreeLayout<String, String> layout = new TreeLayout<>(grafo);
+        TreeLayout<String, String> layout = new TreeLayout<>(grafo, 75, 75);
 
         // Criação do visualizador do grafo
-        VisualizationViewer<String, String> vv = new VisualizationViewer<>(layout, new Dimension(300, 300));
+        VisualizationViewer<String, String> vv = new VisualizationViewer<>(layout, new Dimension(500, 500));
+        final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
 
         // Configurações visuais do visualizador
         vv.addGraphMouseListener(new GraphMouseListener<String>() {
@@ -134,12 +162,12 @@ public class GeradorGrafo extends JFrame {
                 }
             }
         });
-        final DefaultModalGraphMouse<String, Integer> graphMouse = new DefaultModalGraphMouse<String, Integer>();
-        final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
         vv.getRenderContext().setVertexLabelTransformer(String::toString);
         vv.getRenderContext().setVertexLabelRenderer(vertexLabelRenderer);
+        vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer::transform);
         vv.getRenderContext().setEdgeShapeTransformer(EdgeShape.line(grafo));
         vv.getRenderContext().setVertexFillPaintTransformer(vertexColor::transform);
+        vv.getRenderContext().setVertexShapeTransformer(vertexSize::transform);
         vv.getRenderContext().setArrowFillPaintTransformer(Functions.<Paint>constant(Color.lightGray));
         vv.setGraphMouse(graphMouse);
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
