@@ -2,15 +2,23 @@ package br.com.dev1risjc.grafos;
 
 import br.com.dev1risjc.grafos.contrato.InterfaceContrato;
 import br.com.dev1risjc.grafos.contrato.MyJMenuItem;
+import com.google.common.base.Functions;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import edu.uci.ics.jung.graph.DelegateForest;
 import edu.uci.ics.jung.graph.Forest;
+import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.control.CrossoverScalingControl;
+import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.GraphMouseListener;
+import edu.uci.ics.jung.visualization.control.ScalingControl;
+import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +39,7 @@ public class GeradorGrafo extends JFrame {
     }
 
     public void init() {
+        Container content = getContentPane();
         JPopupMenu popupMenu = new JPopupMenu();
         popupMenu.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
 
@@ -76,8 +85,38 @@ public class GeradorGrafo extends JFrame {
                 }
             }
         });
+        final DefaultModalGraphMouse<String, Integer> graphMouse = new DefaultModalGraphMouse<String, Integer>();
+        final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
         vv.getRenderContext().setVertexLabelTransformer(String::toString);
+        vv.getRenderContext().setEdgeShapeTransformer(EdgeShape.line(grafo));
+        vv.getRenderContext().setArrowFillPaintTransformer(Functions.<Paint>constant(Color.lightGray));
+        vv.setGraphMouse(graphMouse);
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
+
+        final ScalingControl scaler = new CrossoverScalingControl();
+
+        JButton plus = new JButton("+");
+        plus.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                scaler.scale(vv, 1.1f, vv.getCenter());
+            }
+        });
+        JButton minus = new JButton("-");
+        minus.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                scaler.scale(vv, 1/1.1f, vv.getCenter());
+            }
+        });
+
+        JPanel scaleGrid = new JPanel(new GridLayout(1,0));
+        scaleGrid.setBorder(BorderFactory.createTitledBorder("Zoom"));
+
+        JPanel controls = new JPanel();
+        scaleGrid.add(plus);
+        scaleGrid.add(minus);
+        controls.add(scaleGrid);
+
+        content.add(controls, BorderLayout.SOUTH);
 
         // Criação do frame para exibir o visualizador
 //        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -85,7 +124,7 @@ public class GeradorGrafo extends JFrame {
 //        setLocationRelativeTo(null);
 //        pack();
 //        setVisible(true);
-        getContentPane().add(vv);
+        content.add(panel);
         grafoGerado = true;
     }
 
@@ -103,6 +142,9 @@ public class GeradorGrafo extends JFrame {
     public void criarVertices() {
         List<InterfaceContrato> distinct = getDistinctKeys();
         for (InterfaceContrato key : distinct) {
+            if (key.isFilho()) {
+
+            }
             grafo.addVertex(key.toString());
         }
     }
@@ -113,7 +155,7 @@ public class GeradorGrafo extends JFrame {
                 String nomeAresta = "Filiação " + key.toString() + " -> " + value.toString();
                 if (!grafo.getEdges().parallelStream().anyMatch(aresta -> nomeAresta.equalsIgnoreCase(aresta))) {
                     grafo.addEdge(nomeAresta , key.toString(), value.toString());
-                    System.out.println("Origem: " + key + " -> Destino: " + value);
+//                    System.out.println("Origem: " + key + " -> Destino: " + value);
                 }
 
             }
