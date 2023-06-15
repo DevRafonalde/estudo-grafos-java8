@@ -11,7 +11,7 @@ public class ModuloFrameImpl implements IModuloFrame {
 
     GeradorGrafo telaGrafos;
 
-    public ModuloFrameImpl(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes, List<InterfaceContrato> filhosImediatos) {
+    public ModuloFrameImpl(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes, List<String> filhosImediatos) {
         this.telaGrafos = new GeradorGrafo(itensPopup, filiacoes, filhosImediatos);
 //        telaGrafos.setLocationRelativeTo(null);
 //        telaGrafos.setTitle("Grafo de filiação de TRAs");

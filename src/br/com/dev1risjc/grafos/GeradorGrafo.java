@@ -13,6 +13,7 @@ import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.GraphMouseListener;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
+import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
 import org.apache.commons.collections4.Transformer;
 
@@ -33,13 +34,12 @@ public class GeradorGrafo extends JFrame {
     Forest<String, String> grafo;
     List<InterfaceContrato> listaVertices = new ArrayList<>();
     HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes;
-    List<InterfaceContrato> filhosImediatos;
+    List<String> filhosImediatos;
 
-    public GeradorGrafo(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes, List<InterfaceContrato> filhosImediatos) {
+    public GeradorGrafo(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes, List<String> filhosImediatos) {
         this.itensPopup = itensPopup;
         this.filiacoes = filiacoes;
         this.filhosImediatos = filhosImediatos;
-        filhosImediatos.stream().forEach(System.out::println);
     }
 
     public void init() {
@@ -49,8 +49,8 @@ public class GeradorGrafo extends JFrame {
                 Color cor;
                 if (!filhosImediatos.isEmpty()) {
                     cor = Color.black;
-                    for (InterfaceContrato filho : filhosImediatos) {
-                        if (filho.toString().equalsIgnoreCase(input)) {
+                    for (String filho : filhosImediatos) {
+                        if (filho.equalsIgnoreCase(input)) {
                             cor = Color.RED;
                         }
                     }
@@ -60,6 +60,34 @@ public class GeradorGrafo extends JFrame {
                 return cor;
             }
         };
+
+        Color cor = Color.BLACK;
+        DefaultVertexLabelRenderer vertexLabelRenderer =
+                new DefaultVertexLabelRenderer(cor) {
+                    @Override
+                    public <V> Component getVertexLabelRendererComponent(
+                            JComponent vv, Object value, Font font,
+                            boolean isSelected, V vertex)
+                    {
+                        super.getVertexLabelRendererComponent(
+                                vv, value, font, isSelected, vertex);
+                        Color cor;
+                        if (!filhosImediatos.isEmpty()) {
+                            cor = Color.WHITE;
+                            for (String filho : filhosImediatos) {
+                                if (filho.equalsIgnoreCase(vertex.toString())) {
+                                    cor = Color.BLACK;
+                                }
+                            }
+                        } else {
+                            cor = Color.WHITE;
+                        }
+                        setForeground(cor);
+                        return this;
+                    }
+                };
+
+
         Container content = getContentPane();
         JPopupMenu popupMenu = new JPopupMenu();
         popupMenu.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
@@ -109,6 +137,7 @@ public class GeradorGrafo extends JFrame {
         final DefaultModalGraphMouse<String, Integer> graphMouse = new DefaultModalGraphMouse<String, Integer>();
         final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
         vv.getRenderContext().setVertexLabelTransformer(String::toString);
+        vv.getRenderContext().setVertexLabelRenderer(vertexLabelRenderer);
         vv.getRenderContext().setEdgeShapeTransformer(EdgeShape.line(grafo));
         vv.getRenderContext().setVertexFillPaintTransformer(vertexColor::transform);
         vv.getRenderContext().setArrowFillPaintTransformer(Functions.<Paint>constant(Color.lightGray));
