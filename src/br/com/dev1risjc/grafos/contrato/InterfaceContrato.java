@@ -12,8 +12,6 @@ public interface InterfaceContrato <V> {
 //    public void navegacaoAvancada(String numeroLivro);
 
     public V getObjeto();
-    public boolean isPai();
-    public boolean isFilho();
     public String toString();
 
 }

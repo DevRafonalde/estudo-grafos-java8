@@ -14,6 +14,7 @@ import edu.uci.ics.jung.visualization.control.GraphMouseListener;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
+import org.apache.commons.collections4.Transformer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,13 +33,33 @@ public class GeradorGrafo extends JFrame {
     Forest<String, String> grafo;
     List<InterfaceContrato> listaVertices = new ArrayList<>();
     HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes;
+    List<InterfaceContrato> filhosImediatos;
 
-    public GeradorGrafo(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes) {
+    public GeradorGrafo(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes, List<InterfaceContrato> filhosImediatos) {
         this.itensPopup = itensPopup;
         this.filiacoes = filiacoes;
+        this.filhosImediatos = filhosImediatos;
+        filhosImediatos.stream().forEach(System.out::println);
     }
 
     public void init() {
+        Transformer<String, Paint> vertexColor = new Transformer<String, Paint>() {
+            @Override
+            public Paint transform(String input) {
+                Color cor;
+                if (!filhosImediatos.isEmpty()) {
+                    cor = Color.black;
+                    for (InterfaceContrato filho : filhosImediatos) {
+                        if (filho.toString().equalsIgnoreCase(input)) {
+                            cor = Color.RED;
+                        }
+                    }
+                } else {
+                    cor = Color.black;
+                }
+                return cor;
+            }
+        };
         Container content = getContentPane();
         JPopupMenu popupMenu = new JPopupMenu();
         popupMenu.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
@@ -52,7 +73,7 @@ public class GeradorGrafo extends JFrame {
         grafo = new DelegateForest<>();
         criarVertices();
         criarArestas();
-        grafo.getEdges().stream().forEach(System.out::println);
+//        grafo.getEdges().stream().forEach(System.out::println);
         TreeLayout<String, String> layout = new TreeLayout<>(grafo);
 
         // Criação do visualizador do grafo
@@ -89,6 +110,7 @@ public class GeradorGrafo extends JFrame {
         final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
         vv.getRenderContext().setVertexLabelTransformer(String::toString);
         vv.getRenderContext().setEdgeShapeTransformer(EdgeShape.line(grafo));
+        vv.getRenderContext().setVertexFillPaintTransformer(vertexColor::transform);
         vv.getRenderContext().setArrowFillPaintTransformer(Functions.<Paint>constant(Color.lightGray));
         vv.setGraphMouse(graphMouse);
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
@@ -115,8 +137,8 @@ public class GeradorGrafo extends JFrame {
         scaleGrid.add(plus);
         scaleGrid.add(minus);
         controls.add(scaleGrid);
-
         content.add(controls, BorderLayout.SOUTH);
+
 
         // Criação do frame para exibir o visualizador
 //        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -142,9 +164,6 @@ public class GeradorGrafo extends JFrame {
     public void criarVertices() {
         List<InterfaceContrato> distinct = getDistinctKeys();
         for (InterfaceContrato key : distinct) {
-            if (key.isFilho()) {
-
-            }
             grafo.addVertex(key.toString());
         }
     }
