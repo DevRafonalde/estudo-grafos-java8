@@ -78,10 +78,11 @@ public class GeradorGrafo extends JFrame {
         Transformer<String, Icon> vertexIcon = new Transformer<String,Icon>() {
             public Icon transform(String vertice) {
 
-                ImageIcon iconLivro2 = new ImageIcon("/Fontes/livro2.png");
+                ImageIcon iconLivro2 = new ImageIcon("src\\Fontes\\livro2.png");
                 ImageIcon iconLivro3 = new ImageIcon("src\\Fontes\\livro3.png");
-                ImageIcon iconLivro8 = new ImageIcon("/Fontes/livro8.png");
-                ImageIcon iconLivro9 = new ImageIcon("/Fontes/livro9.png");
+                ImageIcon iconLivro8 = new ImageIcon("src\\Fontes\\livro8.png");
+                ImageIcon iconLivro9 = new ImageIcon("src\\Fontes\\livro9.png");
+                ImageIcon iconMatricula = new ImageIcon("src\\Fontes\\matricula.png");
 
 //                System.out.println(vertice);
 
@@ -93,6 +94,8 @@ public class GeradorGrafo extends JFrame {
                     return iconLivro8;
                 } else if (vertice.contains("Livro 9")) {
                     return iconLivro9;
+                } else if (vertice.contains("MAT")) {
+                    return iconMatricula;
                 } else {
                     return null;
                 }
