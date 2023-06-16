@@ -71,17 +71,38 @@ public class GeradorGrafo extends JFrame {
             public Shape transform(String i){
                 Ellipse2D circle = new Ellipse2D.Double(-15, -15, 30, 30);
                 // in this case, the vertex is twice as large
-                return AffineTransform.getScaleInstance(1.5, 1.5).createTransformedShape(circle);
+                return AffineTransform.getScaleInstance(2.5, 2.5).createTransformedShape(circle);
             }
         };
 
-        // Set up a new stroke Transformer for the edges
-        // BasicStroke用法：http://momsbaby1986.iteye.com/blog/1462901
-        // 把设置好的画笔通过Transformer返回给edgeStrokeTransformer
+        Transformer<String, Icon> vertexIcon = new Transformer<String,Icon>() {
+            public Icon transform(String vertice) {
+
+                ImageIcon iconLivro2 = new ImageIcon("/Fontes/livro2.png");
+                ImageIcon iconLivro3 = new ImageIcon("src\\Fontes\\livro3.png");
+                ImageIcon iconLivro8 = new ImageIcon("/Fontes/livro8.png");
+                ImageIcon iconLivro9 = new ImageIcon("/Fontes/livro9.png");
+
+//                System.out.println(vertice);
+
+                if (vertice.contains("Livro 2")) {
+                    return iconLivro2;
+                } else if (vertice.contains("TRA")) {
+                    return iconLivro3;
+                } else if (vertice.contains("Livro 8")) {
+                    return iconLivro8;
+                } else if (vertice.contains("Livro 9")) {
+                    return iconLivro9;
+                } else {
+                    return null;
+                }
+            }
+        };
+
         Transformer<String, Stroke> edgeStrokeTransformer = new Transformer<String, Stroke>() {
-            float test[] = {10.0f};
+            float test[] = {20.0f};
             final Stroke linhaMaior = new BasicStroke(1.0f, BasicStroke.CAP_ROUND,
-                    BasicStroke.JOIN_MITER, 10.0f, test, 0.0f);
+                    BasicStroke.JOIN_MITER, 20.0f, test, 0.0f);
             public Stroke transform(String s) {
                 return linhaMaior;
             }
@@ -91,23 +112,19 @@ public class GeradorGrafo extends JFrame {
         DefaultVertexLabelRenderer vertexLabelRenderer =
                 new DefaultVertexLabelRenderer(cor) {
                     @Override
-                    public <V> Component getVertexLabelRendererComponent(
-                            JComponent vv, Object value, Font font,
-                            boolean isSelected, V vertex)
-                    {
-                        super.getVertexLabelRendererComponent(
-                                vv, value, font, isSelected, vertex);
-                        Color cor;
-                        if (!filhosImediatos.isEmpty()) {
-                            cor = Color.WHITE;
-                            for (String filho : filhosImediatos) {
-                                if (filho.equalsIgnoreCase(vertex.toString())) {
-                                    cor = Color.BLACK;
-                                }
-                            }
-                        } else {
-                            cor = Color.WHITE;
-                        }
+                    public <V> Component getVertexLabelRendererComponent(JComponent vv, Object value, Font font, boolean isSelected, V vertex) {
+                        super.getVertexLabelRendererComponent(vv, value, font, isSelected, vertex);
+                        Color cor = Color.WHITE;
+//                        if (!filhosImediatos.isEmpty()) {
+//                            cor = Color.WHITE;
+//                            for (String filho : filhosImediatos) {
+//                                if (filho.equalsIgnoreCase(vertex.toString())) {
+//                                    cor = Color.BLACK;
+//                                }
+//                            }
+//                        } else {
+//                            cor = Color.WHITE;
+//                        }
                         setForeground(cor);
                         setFont(new Font("Trebuchet MS", Font.BOLD, 12));
                         return this;
@@ -128,7 +145,7 @@ public class GeradorGrafo extends JFrame {
         grafo = new DelegateForest<>();
         criarVertices();
         criarArestas();
-//        grafo.getEdges().stream().forEach(System.out::println);
+
         TreeLayout<String, String> layout = new TreeLayout<>(grafo, 75, 75);
 
         // Criação do visualizador do grafo
@@ -162,8 +179,19 @@ public class GeradorGrafo extends JFrame {
                 }
             }
         });
-        vv.getRenderContext().setVertexLabelTransformer(String::toString);
-        vv.getRenderContext().setVertexLabelRenderer(vertexLabelRenderer);
+
+        vv.getRenderContext().setVertexLabelTransformer(
+                // this chains together Functions so that the html tags
+                // are prepended to the toString method output
+                Functions.<Object,String,String>compose(
+                        new Function<String,String>(){
+                            public String apply(String input) {
+                                return "<html><center><span style=\"color: white;\"><br>" + input.substring(0, input.indexOf(" ")) + "<br>" + input.substring(input.indexOf(" ")) + "</span>";
+                            }}, new ToStringLabeller()));
+        vv.getRenderContext().setVertexIconTransformer(vertexIcon::transform);
+//        vv.getRenderContext().setVertexLabelTransformer(String::toString);
+//        vv.getRenderContext().setVertexLabelRenderer(vertexLabelRenderer);
+//        vv.getRenderContext().setVertexLabelRenderer(new DefaultVertexLabelRenderer(Color.WHITE));
         vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer::transform);
         vv.getRenderContext().setEdgeShapeTransformer(EdgeShape.line(grafo));
         vv.getRenderContext().setVertexFillPaintTransformer(vertexColor::transform);
@@ -173,6 +201,9 @@ public class GeradorGrafo extends JFrame {
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
 
         final ScalingControl scaler = new CrossoverScalingControl();
+        scaler.scale(vv, 1.1f, vv.getLocation());
+        scaler.scale(vv, 1.1f, vv.getLocation());
+        scaler.scale(vv, 1.1f, vv.getLocation());
 
         JButton plus = new JButton("+");
         plus.addActionListener(new ActionListener() {
@@ -197,12 +228,6 @@ public class GeradorGrafo extends JFrame {
         content.add(controls, BorderLayout.SOUTH);
 
 
-        // Criação do frame para exibir o visualizador
-//        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        setTitle("Grafo de filiação de TRAs");
-//        setLocationRelativeTo(null);
-//        pack();
-//        setVisible(true);
         content.add(panel);
         grafoGerado = true;
     }
@@ -231,7 +256,6 @@ public class GeradorGrafo extends JFrame {
                 String nomeAresta = "Filiação " + key.toString() + " -> " + value.toString();
                 if (!grafo.getEdges().parallelStream().anyMatch(aresta -> nomeAresta.equalsIgnoreCase(aresta))) {
                     grafo.addEdge(nomeAresta , key.toString(), value.toString());
-//                    System.out.println("Origem: " + key + " -> Destino: " + value);
                 }
 
             }
