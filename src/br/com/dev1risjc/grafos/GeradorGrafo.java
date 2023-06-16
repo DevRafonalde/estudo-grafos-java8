@@ -84,18 +84,18 @@ public class GeradorGrafo extends JFrame {
                 ImageIcon iconLivro9 = new ImageIcon("src\\Fontes\\livro9.png");
                 ImageIcon iconMatricula = new ImageIcon("src\\Fontes\\matricula.png");
 
-//                System.out.println(vertice);
-
-                if (vertice.contains("Livro 2")) {
-                    return iconLivro2;
-                } else if (vertice.contains("TRA")) {
+                if (vertice.contains("TRA")) {
                     return iconLivro3;
-                } else if (vertice.contains("Livro 8")) {
-                    return iconLivro8;
-                } else if (vertice.contains("Livro 9")) {
-                    return iconLivro9;
                 } else if (vertice.contains("MAT")) {
                     return iconMatricula;
+                } else if (vertice.contains("LV8")) {
+                    return iconLivro8;
+                } else if (vertice.contains("2RI")) {
+                    return iconLivro2;
+                } else if (vertice.contains("RIC")) {
+                    return iconLivro9;
+                } else if (vertice.contains("Transcricao Antiga")) {
+                    return iconLivro3;
                 } else {
                     return null;
                 }
