@@ -268,7 +268,6 @@ public class GeradorGrafo extends JFrame {
         boolean primeiraVez = true;
         for (InterfaceContrato key : distinct) {
             if (!filhosImediatos.contains(key.toString())) {
-                System.out.println(key);
                 grafo.addVertex(key.toString());
             }
             if (primeiraVez && filhosImediatos.contains(key.toString())){
