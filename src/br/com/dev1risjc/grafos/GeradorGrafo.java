@@ -48,6 +48,8 @@ public class GeradorGrafo extends JFrame {
     }
 
     public void init() {
+        // Esse código abaixo somente é usado no caso de não possuir uma implementação de ícone personalizado para o livro correspondente
+        //<editor-fold desc="Mudar cor dos vértices">
         final DefaultModalGraphMouse<String, Integer> graphMouse = new DefaultModalGraphMouse<String, Integer>();
         Transformer<String, Paint> vertexColor = new Transformer<String, Paint>() {
             @Override
@@ -66,7 +68,9 @@ public class GeradorGrafo extends JFrame {
                 return cor;
             }
         };
+        //</editor-fold>
 
+        //<editor-fold desc="Tamanho dos vértices">
         Transformer<String,Shape> vertexSize = new Transformer<String,Shape>(){
             public Shape transform(String i){
                 Ellipse2D circle = new Ellipse2D.Double(-15, -15, 30, 30);
@@ -74,7 +78,9 @@ public class GeradorGrafo extends JFrame {
                 return AffineTransform.getScaleInstance(2.5, 2.5).createTransformedShape(circle);
             }
         };
+        //</editor-fold>
 
+        //<editor-fold desc="Ícones nos vértices">
         Transformer<String, Icon> vertexIcon = new Transformer<String,Icon>() {
             public Icon transform(String vertice) {
 
@@ -101,7 +107,9 @@ public class GeradorGrafo extends JFrame {
                 }
             }
         };
+        //</editor-fold>
 
+        //<editor-fold desc="Mudar layout das arestas">
         Transformer<String, Stroke> edgeStrokeTransformer = new Transformer<String, Stroke>() {
             float test[] = {20.0f};
             final Stroke linhaMaior = new BasicStroke(1.0f, BasicStroke.CAP_ROUND,
@@ -110,29 +118,27 @@ public class GeradorGrafo extends JFrame {
                 return linhaMaior;
             }
         };
+        //</editor-fold>
 
-        Color cor = Color.BLACK;
-        DefaultVertexLabelRenderer vertexLabelRenderer =
-                new DefaultVertexLabelRenderer(cor) {
+        //<editor-fold desc="Cor do texto dos vértices">
+        Color cor = Color.WHITE;
+        DefaultVertexLabelRenderer vertexLabelRenderer = new DefaultVertexLabelRenderer(cor) {
                     @Override
                     public <V> Component getVertexLabelRendererComponent(JComponent vv, Object value, Font font, boolean isSelected, V vertex) {
                         super.getVertexLabelRendererComponent(vv, value, font, isSelected, vertex);
-                        Color cor = Color.WHITE;
 //                        if (!filhosImediatos.isEmpty()) {
-//                            cor = Color.WHITE;
 //                            for (String filho : filhosImediatos) {
 //                                if (filho.equalsIgnoreCase(vertex.toString())) {
 //                                    cor = Color.BLACK;
 //                                }
 //                            }
-//                        } else {
-//                            cor = Color.WHITE;
 //                        }
                         setForeground(cor);
                         setFont(new Font("Trebuchet MS", Font.BOLD, 12));
                         return this;
                     }
                 };
+        //</editor-fold>
 
 
         Container content = getContentPane();
@@ -146,6 +152,7 @@ public class GeradorGrafo extends JFrame {
         }
 
         grafo = new DelegateForest<>();
+
         criarVertices();
         criarArestas();
 
@@ -155,7 +162,6 @@ public class GeradorGrafo extends JFrame {
         VisualizationViewer<String, String> vv = new VisualizationViewer<>(layout, new Dimension(500, 500));
         final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
 
-        // Configurações visuais do visualizador
         vv.addGraphMouseListener(new GraphMouseListener<String>() {
             @Override
             public void graphClicked(String s, MouseEvent mouseEvent) {
@@ -184,13 +190,14 @@ public class GeradorGrafo extends JFrame {
         });
 
         vv.getRenderContext().setVertexLabelTransformer(
-                // this chains together Functions so that the html tags
-                // are prepended to the toString method output
+                // Esse código serve para criar o texto que aparecerá na visualização dos ícones
+                // Ele divide a String no primeiro espaço que achar e quebra em 2 (troca um espaço por um enter)
                 Functions.<Object,String,String>compose(
                         new Function<String,String>(){
                             public String apply(String input) {
                                 return "<html><center><span style=\"color: white;\"><br>" + input.substring(0, input.indexOf(" ")) + "<br>" + input.substring(input.indexOf(" ")) + "</span>";
-                            }}, new ToStringLabeller()));
+                            }
+                        }, new ToStringLabeller()));
         vv.getRenderContext().setVertexIconTransformer(vertexIcon::transform);
 //        vv.getRenderContext().setVertexLabelTransformer(String::toString);
 //        vv.getRenderContext().setVertexLabelRenderer(vertexLabelRenderer);
@@ -203,6 +210,8 @@ public class GeradorGrafo extends JFrame {
         vv.setGraphMouse(graphMouse);
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
 
+
+        //<editor-fold desc="Implementação do Zoom">
         final ScalingControl scaler = new CrossoverScalingControl();
         scaler.scale(vv, 1.1f, vv.getLocation());
         scaler.scale(vv, 1.1f, vv.getLocation());
@@ -229,6 +238,7 @@ public class GeradorGrafo extends JFrame {
         scaleGrid.add(minus);
         controls.add(scaleGrid);
         content.add(controls, BorderLayout.SOUTH);
+        //</editor-fold>
 
 
         content.add(panel);
