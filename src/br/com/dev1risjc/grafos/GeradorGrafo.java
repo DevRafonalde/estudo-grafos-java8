@@ -165,6 +165,7 @@ public class GeradorGrafo extends JFrame {
         VisualizationViewer<String, String> vv = new VisualizationViewer<>(layout, new Dimension(500, 500));
         final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
 
+        //<editor-fold desc="Mouse Listener">
         vv.addGraphMouseListener(new GraphMouseListener<String>() {
             @Override
             public void graphClicked(String s, MouseEvent mouseEvent) {
@@ -191,6 +192,7 @@ public class GeradorGrafo extends JFrame {
                 }
             }
         });
+        //</editor-fold>
 
         vv.getRenderContext().setVertexLabelTransformer(
                 // Esse código serve para criar o texto que aparecerá na visualização dos ícones
@@ -198,17 +200,16 @@ public class GeradorGrafo extends JFrame {
                 Functions.<Object,String,String>compose(
                         new Function<String,String>(){
                             public String apply(String input) {
-                                String cssTexto = "color: white;";
+                                String css = "color: white;";
                                 if (input.contains("Ciclo")) {
-                                    cssTexto = "color: red; font-weight: 600;";
+                                    css = "color: red; font-weight: 600;";
                                 }
-                                return "<html><center><span style=\"" + cssTexto + "\"><br>" + input.substring(0, input.indexOf(" ")) + "<br>" + input.substring(input.indexOf(" ")) + "</span>";
+
+                                return "<html><center><span style=\"" + css + "\"><br>" + input.substring(0, input.indexOf(" ")) + "<br>" + input.substring(input.indexOf(" ")) + "</span>";
                             }
                         }, new ToStringLabeller()));
+
         vv.getRenderContext().setVertexIconTransformer(vertexIcon::transform);
-//        vv.getRenderContext().setVertexLabelTransformer(String::toString);
-//        vv.getRenderContext().setVertexLabelRenderer(vertexLabelRenderer);
-//        vv.getRenderContext().setVertexLabelRenderer(new DefaultVertexLabelRenderer(Color.WHITE));
         vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer::transform);
         vv.getRenderContext().setEdgeShapeTransformer(EdgeShape.line(grafo));
         vv.getRenderContext().setVertexFillPaintTransformer(vertexColor::transform);
@@ -254,11 +255,14 @@ public class GeradorGrafo extends JFrame {
 
     private List<InterfaceContrato> getDistinctKeys() {
         HashMap<InterfaceContrato, InterfaceContrato> distinct = new HashMap<>();
+
         for (InterfaceContrato key : filiacoes.keySet()) {
             distinct.putIfAbsent(key, null);
+
             for (InterfaceContrato value : filiacoes.get(key)) {
                 distinct.putIfAbsent(value, null);
             }
+
         }
         return distinct.keySet().stream().collect(Collectors.toList());
     }
@@ -266,26 +270,35 @@ public class GeradorGrafo extends JFrame {
     public void criarVertices() {
         List<InterfaceContrato> distinct = getDistinctKeys();
         boolean primeiraVez = true;
+
         for (InterfaceContrato key : distinct) {
+
             if (!filhosImediatos.contains(key.toString())) {
                 grafo.addVertex(key.toString());
             }
+
             if (primeiraVez && filhosImediatos.contains(key.toString())){
                 primeiraVez = false;
                 grafo.addVertex(key.toString());
             }
+
         }
     }
 
     public void criarArestas() {
         for (InterfaceContrato key : filiacoes.keySet()) {
             for (InterfaceContrato value : filiacoes.get(key)) {
+
                 String nomeAresta = "Filiação " + key.toString() + " -> " + value.toString();
+
                 if (!grafo.getEdges().parallelStream().anyMatch(aresta -> nomeAresta.equalsIgnoreCase(aresta))) {
+
                     if (key.toString().equalsIgnoreCase(value.toString())) {
+
                         String cicloDetectado = "Ciclo detectado em " + key.toString();
                         grafo.addVertex(cicloDetectado);
                         grafo.addEdge("Aresta ciclo", key.toString(), cicloDetectado);
+
                     } else {
                         grafo.addEdge(nomeAresta , key.toString(), value.toString());
                     }
