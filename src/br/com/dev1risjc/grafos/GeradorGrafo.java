@@ -120,11 +120,15 @@ public class GeradorGrafo extends JFrame {
         //</editor-fold>
 
         //<editor-fold desc="Cor do texto dos vértices">
-        Color cor = Color.WHITE;
-        DefaultVertexLabelRenderer vertexLabelRenderer = new DefaultVertexLabelRenderer(cor) {
+//        Color cor = Color.WHITE;
+        DefaultVertexLabelRenderer vertexLabelRenderer = new DefaultVertexLabelRenderer(Color.WHITE) {
                     @Override
                     public <V> Component getVertexLabelRendererComponent(JComponent vv, Object value, Font font, boolean isSelected, V vertex) {
+                        Color cor = Color.WHITE;
                         super.getVertexLabelRendererComponent(vv, value, font, isSelected, vertex);
+                        if (vertex.toString().contains("Ciclo")) {
+                            cor = Color.red;
+                        }
 //                        if (!filhosImediatos.isEmpty()) {
 //                            for (String filho : filhosImediatos) {
 //                                if (filho.equalsIgnoreCase(vertex.toString())) {
@@ -194,7 +198,11 @@ public class GeradorGrafo extends JFrame {
                 Functions.<Object,String,String>compose(
                         new Function<String,String>(){
                             public String apply(String input) {
-                                return "<html><center><span style=\"color: white;\"><br>" + input.substring(0, input.indexOf(" ")) + "<br>" + input.substring(input.indexOf(" ")) + "</span>";
+                                String cssTexto = "color: white;";
+                                if (input.contains("Ciclo")) {
+                                    cssTexto = "color: red; font-weight: 600;";
+                                }
+                                return "<html><center><span style=\"" + cssTexto + "\"><br>" + input.substring(0, input.indexOf(" ")) + "<br>" + input.substring(input.indexOf(" ")) + "</span>";
                             }
                         }, new ToStringLabeller()));
         vv.getRenderContext().setVertexIconTransformer(vertexIcon::transform);
@@ -257,8 +265,16 @@ public class GeradorGrafo extends JFrame {
 
     public void criarVertices() {
         List<InterfaceContrato> distinct = getDistinctKeys();
+        boolean primeiraVez = true;
         for (InterfaceContrato key : distinct) {
-            grafo.addVertex(key.toString());
+            if (!filhosImediatos.contains(key.toString())) {
+                System.out.println(key);
+                grafo.addVertex(key.toString());
+            }
+            if (primeiraVez && filhosImediatos.contains(key.toString())){
+                primeiraVez = false;
+                grafo.addVertex(key.toString());
+            }
         }
     }
 
@@ -267,9 +283,14 @@ public class GeradorGrafo extends JFrame {
             for (InterfaceContrato value : filiacoes.get(key)) {
                 String nomeAresta = "Filiação " + key.toString() + " -> " + value.toString();
                 if (!grafo.getEdges().parallelStream().anyMatch(aresta -> nomeAresta.equalsIgnoreCase(aresta))) {
-                    grafo.addEdge(nomeAresta , key.toString(), value.toString());
+                    if (key.toString().equalsIgnoreCase(value.toString())) {
+                        String cicloDetectado = "Ciclo detectado em " + key.toString();
+                        grafo.addVertex(cicloDetectado);
+                        grafo.addEdge("Aresta ciclo", key.toString(), cicloDetectado);
+                    } else {
+                        grafo.addEdge(nomeAresta , key.toString(), value.toString());
+                    }
                 }
-
             }
         }
     }
