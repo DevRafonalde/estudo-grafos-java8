@@ -2,6 +2,7 @@ package br.com.dev1risjc.grafos;
 
 import br.com.dev1risjc.grafos.contrato.InterfaceContrato;
 import br.com.dev1risjc.grafos.contrato.MyJMenuItem;
+import br.com.dev1risjc.grafos.tratamentoCiclos.MyDelegateForest;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
@@ -154,7 +155,7 @@ public class GeradorGrafo extends JFrame {
             }
         }
 
-        grafo = new DelegateForest<>();
+        grafo = new MyDelegateForest();
 
         criarVertices();
         criarArestas();
@@ -295,12 +296,19 @@ public class GeradorGrafo extends JFrame {
 
                     if (key.toString().equalsIgnoreCase(value.toString())) {
 
-                        String cicloDetectado = "Ciclo detectado em " + key.toString();
+                        String cicloDetectado = "Ciclo detectado em " + key;
                         grafo.addVertex(cicloDetectado);
                         grafo.addEdge("Aresta ciclo", key.toString(), cicloDetectado);
 
                     } else {
-                        grafo.addEdge(nomeAresta , key.toString(), value.toString());
+                        try {
+                            grafo.addEdge(nomeAresta , key.toString(), value.toString());
+                        } catch (IllegalArgumentException e) {
+                            String cicloDetectado = "Ciclo detectado em " + key;
+                            grafo.addVertex(cicloDetectado);
+                            grafo.addEdge("Aresta ciclo", key.toString(), cicloDetectado);
+                        }
+
                     }
                 }
             }
