@@ -40,11 +40,13 @@ public class GeradorGrafo extends JFrame {
     List<InterfaceContrato> listaVertices = new ArrayList<>();
     HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes;
     List<String> filhosImediatos;
+    Integer livroPesquisado;
 
-    public GeradorGrafo(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes, List<String> filhosImediatos) {
+    public GeradorGrafo(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes, List<String> filhosImediatos, Integer livroPesquisado) {
         this.itensPopup = itensPopup;
         this.filiacoes = filiacoes;
         this.filhosImediatos = filhosImediatos;
+        this.livroPesquisado = livroPesquisado;
     }
 
     public void init() {
@@ -202,11 +204,18 @@ public class GeradorGrafo extends JFrame {
                         new Function<String,String>(){
                             public String apply(String input) {
                                 String css = "color: white;";
+                                String tipoLivro = input.substring(0, input.indexOf(" "));
+                                String numeroLivro = input.substring(input.indexOf(" ")+1).trim();
+
                                 if (input.contains("Ciclo")) {
                                     css = "color: red; font-weight: 600;";
                                 }
 
-                                return "<html><center><span style=\"" + css + "\"><br>" + input.substring(0, input.indexOf(" ")) + "<br>" + input.substring(input.indexOf(" ")) + "</span>";
+                                if (numeroLivro.equals(livroPesquisado.toString())) {
+                                    css = "color: orange; font-weight: 600;";
+                                }
+
+                                return "<html><center><span style=\"" + css + "\"><br>" + tipoLivro + "<br>" + numeroLivro + "</span>";
                             }
                         }, new ToStringLabeller()));
 
