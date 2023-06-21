@@ -120,29 +120,29 @@ public class GeradorGrafo extends JFrame {
         };
         //</editor-fold>
 
-        //<editor-fold desc="Cor do texto dos vértices">
-//        Color cor = Color.WHITE;
-        DefaultVertexLabelRenderer vertexLabelRenderer = new DefaultVertexLabelRenderer(Color.WHITE) {
-                    @Override
-                    public <V> Component getVertexLabelRendererComponent(JComponent vv, Object value, Font font, boolean isSelected, V vertex) {
-                        Color cor = Color.WHITE;
-                        super.getVertexLabelRendererComponent(vv, value, font, isSelected, vertex);
-                        if (vertex.toString().contains("Ciclo")) {
-                            cor = Color.red;
-                        }
-//                        if (!filhosImediatos.isEmpty()) {
-//                            for (String filho : filhosImediatos) {
-//                                if (filho.equalsIgnoreCase(vertex.toString())) {
-//                                    cor = Color.BLACK;
-//                                }
-//                            }
+//        //<editor-fold desc="Cor do texto dos vértices">
+////        Color cor = Color.WHITE;
+//        DefaultVertexLabelRenderer vertexLabelRenderer = new DefaultVertexLabelRenderer(Color.WHITE) {
+//                    @Override
+//                    public <V> Component getVertexLabelRendererComponent(JComponent vv, Object value, Font font, boolean isSelected, V vertex) {
+//                        Color cor = Color.WHITE;
+//                        super.getVertexLabelRendererComponent(vv, value, font, isSelected, vertex);
+//                        if (vertex.toString().contains("Ciclo")) {
+//                            cor = Color.red;
 //                        }
-                        setForeground(cor);
-                        setFont(new Font("Trebuchet MS", Font.BOLD, 12));
-                        return this;
-                    }
-                };
-        //</editor-fold>
+////                        if (!filhosImediatos.isEmpty()) {
+////                            for (String filho : filhosImediatos) {
+////                                if (filho.equalsIgnoreCase(vertex.toString())) {
+////                                    cor = Color.BLACK;
+////                                }
+////                            }
+////                        }
+//                        setForeground(cor);
+//                        setFont(new Font("Trebuchet MS", Font.BOLD, 12));
+//                        return this;
+//                    }
+//                };
+//        //</editor-fold>
 
 
         Container content = getContentPane();
@@ -301,6 +301,7 @@ public class GeradorGrafo extends JFrame {
                         grafo.addEdge("Aresta ciclo", key.toString(), cicloDetectado);
 
                     } else {
+
                         try {
                             grafo.addEdge(nomeAresta , key.toString(), value.toString());
                         } catch (IllegalArgumentException e) {
