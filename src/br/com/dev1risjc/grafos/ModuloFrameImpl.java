@@ -13,9 +13,6 @@ public class ModuloFrameImpl implements IModuloFrame {
 
     public ModuloFrameImpl(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes, List<String> filhosImediatos, Integer livroPesquisado) {
         this.telaGrafos = new GeradorGrafo(itensPopup, filiacoes, filhosImediatos, livroPesquisado);
-//        telaGrafos.setLocationRelativeTo(null);
-//        telaGrafos.setTitle("Grafo de filiação de TRAs");
-//        telaGrafos.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     @Override
@@ -32,16 +29,6 @@ public class ModuloFrameImpl implements IModuloFrame {
     public void limparTela() {
         telaGrafos.limparTela();
     }
-
-//    @Override
-//    public void criarVertices() {
-//        telaGrafos.criarVertices();
-//    }
-//
-//    @Override
-//    public void criarArestas() {
-//        telaGrafos.criarArestas();
-//    }
 
     @Override
     public void refazerTela() {

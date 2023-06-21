@@ -12,10 +12,10 @@ public class MyDelegateForest extends DelegateForest<String, String> {
         // Cria uma cópia temporária do grafo para fazer a verificação de ciclos
         DelegateForest<String, String> tempForest = DelegateForestUtils.copyDelegateForest(this);
 
-        // Adiciona a aresta temporariamente ao grafo
+        // Adiciona a aresta ao grafo cópia
         tempForest.addEdge(edge, source, target);
 
-        // Utiliza o algoritmo de detecção de ciclos para verificar se o grafo temporário possui ciclos
+        // Utiliza o algoritmo de detecção de ciclos para verificar se o grafo temporário possui ciclos e lança uma exceção em caso positivo
         DetectorCiclo cycleDetector = new DetectorCiclo(tempForest);
         if (!cycleDetector.detectarCiclos().equals("")) {
             throw new IllegalArgumentException("A adição dessa aresta criaria um ciclo no grafo.");

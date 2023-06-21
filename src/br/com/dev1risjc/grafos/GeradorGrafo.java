@@ -35,12 +35,12 @@ import java.util.stream.Collectors;
 public class GeradorGrafo extends JFrame {
     private boolean grafoGerado = false;
     private String numeroLivroEscolhido;
-    List<MyJMenuItem> itensPopup;
-    Forest<String, String> grafo;
-    List<InterfaceContrato> listaVertices = new ArrayList<>();
-    HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes;
-    List<String> filhosImediatos;
     Integer livroPesquisado;
+    List<MyJMenuItem> itensPopup;
+    List<InterfaceContrato> listaVertices = new ArrayList<>();
+    List<String> filhosImediatos;
+    HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes;
+    Forest<String, String> grafo;
 
     public GeradorGrafo(List<MyJMenuItem> itensPopup, HashMap<InterfaceContrato, List<InterfaceContrato>> filiacoes, List<String> filhosImediatos, Integer livroPesquisado) {
         this.itensPopup = itensPopup;
@@ -86,10 +86,10 @@ public class GeradorGrafo extends JFrame {
         Transformer<String, Icon> vertexIcon = new Transformer<String,Icon>() {
             public Icon transform(String vertice) {
 
-                ImageIcon iconLivro2 = new ImageIcon("src\\Fontes\\livro2.png");
+                ImageIcon icon2RI = new ImageIcon("src\\Fontes\\2RI.png");
                 ImageIcon iconLivro3 = new ImageIcon("src\\Fontes\\livro3.png");
                 ImageIcon iconLivro8 = new ImageIcon("src\\Fontes\\livro8.png");
-                ImageIcon iconLivro9 = new ImageIcon("src\\Fontes\\livro9.png");
+                ImageIcon iconRic = new ImageIcon("src\\Fontes\\RIC.png");
                 ImageIcon iconMatricula = new ImageIcon("src\\Fontes\\matricula.png");
 
                 if (vertice.contains("TRA")) {
@@ -99,9 +99,9 @@ public class GeradorGrafo extends JFrame {
                 } else if (vertice.contains("LV8")) {
                     return iconLivro8;
                 } else if (vertice.contains("2RI")) {
-                    return iconLivro2;
+                    return icon2RI;
                 } else if (vertice.contains("RIC")) {
-                    return iconLivro9;
+                    return iconRic;
                 } else if (vertice.contains("Transcricao Antiga")) {
                     return iconLivro3;
                 } else {
@@ -147,6 +147,7 @@ public class GeradorGrafo extends JFrame {
 //        //</editor-fold>
 
 
+        //<editor-fold desc="Implementação de interatividade">
         Container content = getContentPane();
         JPopupMenu popupMenu = new JPopupMenu();
         popupMenu.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
@@ -156,6 +157,7 @@ public class GeradorGrafo extends JFrame {
                 popupMenu.add(menuItem);
             }
         }
+        //</editor-fold>
 
         grafo = new MyDelegateForest();
 
@@ -197,20 +199,21 @@ public class GeradorGrafo extends JFrame {
         });
         //</editor-fold>
 
-        vv.getRenderContext().setVertexLabelTransformer(
-                // Esse código serve para criar o texto que aparecerá na visualização dos ícones
-                // Ele divide a String no primeiro espaço que achar e quebra em 2 (troca um espaço por um enter)
-                Functions.<Object,String,String>compose(
+        vv.getRenderContext().setVertexLabelTransformer(Functions.<Object,String,String>compose(
+                        // Esse código serve para criar o texto que aparecerá na visualização dos ícones
+                        // Ele divide a String no primeiro espaço que achar e quebra em 2 (troca um espaço por um enter)
                         new Function<String,String>(){
                             public String apply(String input) {
                                 String css = "color: white;";
                                 String tipoLivro = input.substring(0, input.indexOf(" "));
                                 String numeroLivro = input.substring(input.indexOf(" ")+1).trim();
 
+                                // Texto vermelho em caso de Ciclos
                                 if (input.contains("Ciclo")) {
                                     css = "color: red; font-weight: 600;";
                                 }
 
+                                // Texto laranja no que for o livro pesquisado
                                 if (numeroLivro.equals(livroPesquisado.toString())) {
                                     css = "color: orange; font-weight: 600;";
                                 }
